@@ -2,10 +2,10 @@ const desktopIdle = require('desktop-idle');
 const notifier = require('node-notifier');
 const RecordingCli = require('./cli/RecordingCli');
 const SessionStatus = require('./utils/SessionStatus');
-const STOP_SESSION_THRESHOLD = 1000 * 60 * 5; // 5 minutes
+const STOP_SESSION_THRESHOLD = 60 * 5; // 5 minutes
 
 // JOB to stop session if user is idle for more than 5 minutes
-setInterval(() => (async() => {
+setInterval(() => (async () => {
     let status = (await RecordingCli.status()).status;
     if (status === SessionStatus.RUNNING && desktopIdle.getIdleTime() > STOP_SESSION_THRESHOLD) {
         await RecordingCli.stop();
@@ -16,7 +16,7 @@ setInterval(() => (async() => {
                             timeout: 10,
                             sound: true,
                             actions: "Start"
-        }, (error, response, metadata) => (async() => {
+                        }, (error, response, metadata) => (async () => {
             if (response === 'activate') {
                 await RecordingCli.start();
             }
