@@ -1,10 +1,9 @@
 {
-  "name": "foxus",
+  "name": "TimeSnare",
   "version": "0.0.1",
   "main": "index.js",
-  "author": "foxus",
-  "license": "None",
-  "private": true,
+  "author": "deepakputhraya",
+  "license": "MIT",
   "dependencies": {
     "aperture": "^2.1.1",
     "chalk": "^2.1.0",

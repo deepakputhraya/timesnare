@@ -10,7 +10,7 @@ Router.post('/', Middleware(async (req, res, next) => {
     res.status(200).json({ message: "Started focus session" });
 }));
 
-Router.delete('/', Middleware(async (req, res, next) => {
+Router.put('/', Middleware(async (req, res, next) => {
     await RecordingService.stop(req.ctx);
     res.status(200).json({ message: "Focus session stopped" });
 }));
@@ -18,6 +18,16 @@ Router.delete('/', Middleware(async (req, res, next) => {
 Router.get('/', Middleware(async (req, res, next) => {
     let focusSessions =  await RecordingService.list(req.ctx);
     res.status(200).json({ sessions: focusSessions });
+}));
+
+Router.delete('/', Middleware(async (req, res, next) => {
+    await RecordingService.terminateAll(req.ctx);
+    res.status(200).json({ message: "Focus session deleted" });
+}));
+
+Router.delete('/:focusId(\\d+)', Middleware(async (req, res, next) => {
+    await RecordingService.terminate(req.ctx, req.params.focusId);
+    res.status(200).json({ message: "Focus session deleted" });
 }));
 
 Router.get('/status', Middleware(async (req, res, next) => {

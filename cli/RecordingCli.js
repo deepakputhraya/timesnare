@@ -1,5 +1,6 @@
+const config = require('../config');
 const rp = require('request-promise-native');
-const URI = 'http://127.0.0.1:3000/api/v0/session';
+const URI = 'http://127.0.0.1:' + (config.port || 10567) + '/api/v0/session';
 
 class RecordingCli {
     static async start() {
@@ -12,10 +13,18 @@ class RecordingCli {
 
     static async stop() {
         return rp({
-                      method: 'DELETE',
+                      method: 'PUT',
                       uri: URI,
                       json: true
         });
+    }
+
+    static async terminate(focusId) {
+        return rp({
+                      method: 'DELETE',
+                      uri: [URI, '/', focusId].join(''),
+                      json: true
+                  });
     }
 
     static async list() {

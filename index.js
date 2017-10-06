@@ -9,7 +9,7 @@ const moment = require('moment');
 const execSync = require('child_process').execSync;
 const prettyMs = require('pretty-ms');
 const chalk = require('chalk');
-
+const fs = require('fs');
 
 const LOGGER = {
     info : (str) => console.log(chalk.bold.blue(str)),
@@ -19,12 +19,8 @@ const LOGGER = {
 
 let errorHandler = (err) => {
     let msg;
-    if (err.error) {
-        msg = err.error.message;
-    }
-    if (!msg && err.message) {
-        msg = err.message;
-    }
+    if (err.error) msg = err.error.message;
+    if (!msg && err.message) msg = err.message;
     LOGGER.error(msg || "ERROR: Something went wrong" );
 };
 
@@ -49,6 +45,13 @@ program.command('stop')
     }) ().catch(errorHandler));
 
 
+program.command('terminate [session-id]')
+    .description('Delete a focus session. Deletes all sessions if session-id is not given')
+    .action((focusId) => (async() => {
+        let data = await Recording.terminate(focusId);
+        LOGGER.info(data.message);
+    }) ().catch(errorHandler));
+
 program.command('list')
     .description('List all focus sessions')
     .action(() => (async() => {
@@ -63,25 +66,12 @@ program.command('list')
             s.end_time = s.end_time ? s.end_time : '-';
             return s;
         });
-        Helper.renderTable([{
-            key: 'id',
-            value: 'ID'
-        }, {
-            key: 'start_time',
-            value: 'START TIME'
-        }, {
-            key: 'end_time',
-            value: 'END TIME'
-        }, {
-            key: 'video_path',
-            value: 'VIDEO PATH'
-        }, {
-            key : 'duration',
-            value: 'DURATION'
-        },{
-            key : 'status',
-            value: 'STATUS'
-        }], sessions);
+        Helper.renderTable(_.map(['id', 'start_time', 'end_time', 'video_path', 'duration', 'status'], (item) => {
+            return {
+                key: item,
+                value: item.toUpperCase().replace('_', ' ')
+            }
+        }), sessions);
     }) ().catch(errorHandler));
 
 
@@ -90,6 +80,7 @@ program.command('play [session-id]')
     .action((focusId) => (async() => {
         if (focusId) {
             let focusSession = await Recording.get(focusId);
+            if (!fs.existsSync(focusSession.session.video_path)) throw new Error("Recording does not exist");
             execSync(['open', focusSession.session.video_path].join(' '));
         }else {
             throw new Error("Provide the session id");

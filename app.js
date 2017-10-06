@@ -3,6 +3,9 @@ const app = express();
 const aperture = require('aperture')();
 const config = require('./config');
 const db = require('knex')(config.database);
+const FileSystem = require('./utils/FileSystem');
+
+FileSystem.mkdir([process.env.HOME, '.timesnare'].join('/'));
 
 db.migrate.latest();
 
@@ -21,4 +24,4 @@ app.use(function (req, res, next) {
 
 app.use('/api/v0/session',require('./routes/Recording'));
 
-app.listen(3000);
+app.listen(config.port || 10567);
