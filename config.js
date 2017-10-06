@@ -9,7 +9,7 @@ module.exports = {
         useNullAsDefault: true,
         migrations: {
             tableName: 'migrations',
-            directory: 'migrations'
+            directory: __dirname + '/migrations'
         }
     }
 };
